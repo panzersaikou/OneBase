@@ -4,8 +4,6 @@
 
 namespace onebase {
 
-template class BPlusTreeIterator<int, RID, std::less<int>>;
-
 template <typename KeyType, typename ValueType, typename KeyComparator>
 BPLUSTREE_ITERATOR_TYPE::BPlusTreeIterator(page_id_t page_id, int index, BufferPoolManager *bpm)
     : page_id_(page_id), index_(index), bpm_(bpm) {}
@@ -36,5 +34,7 @@ template <typename KeyType, typename ValueType, typename KeyComparator>
 auto BPLUSTREE_ITERATOR_TYPE::operator!=(const BPlusTreeIterator &other) const -> bool {
   return !(*this == other);
 }
+
+template class BPlusTreeIterator<int, RID, std::less<int>>;
 
 }  // namespace onebase

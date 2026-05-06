@@ -5,8 +5,6 @@
 
 namespace onebase {
 
-template class BPlusTree<int, RID, std::less<int>>;
-
 template <typename KeyType, typename ValueType, typename KeyComparator>
 BPLUSTREE_TYPE::BPlusTree(std::string name, BufferPoolManager *bpm, const KeyComparator &comparator,
                            int leaf_max_size, int internal_max_size)
@@ -68,5 +66,7 @@ template <typename KeyType, typename ValueType, typename KeyComparator>
 auto BPLUSTREE_TYPE::End() -> Iterator {
   return Iterator(INVALID_PAGE_ID, 0);
 }
+
+template class BPlusTree<int, RID, std::less<int>>;
 
 }  // namespace onebase
