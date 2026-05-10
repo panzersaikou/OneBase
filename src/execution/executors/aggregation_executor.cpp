@@ -67,6 +67,7 @@ void AggregationExecutor::Init() {
 
       switch (agg_type) {
         case AggregationType::CountStarAggregate:
+        
         case AggregationType::CountAggregate:
           state.aggregate_values[i] = state.aggregate_values[i].Add(Value(TypeId::INTEGER, 1));
           break;
@@ -80,6 +81,7 @@ void AggregationExecutor::Init() {
             state.initialized[i] = true;
           }
           break;
+
         case AggregationType::MaxAggregate:
           if (!state.initialized[i] || input.CompareGreaterThan(state.aggregate_values[i]).GetAsBoolean()) {
             state.aggregate_values[i] = input;

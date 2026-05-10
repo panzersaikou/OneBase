@@ -21,7 +21,6 @@ auto DeleteExecutor::Next(Tuple *tuple, RID *rid) -> bool {
   auto *catalog = GetExecutorContext()->GetCatalog();
   auto *table_info = catalog->GetTable(plan_->GetTableOid());
   auto indexes = catalog->GetTableIndexes(table_info->name_);
-
   int32_t count = 0;
   Tuple child_tuple;
   RID child_rid;
@@ -33,6 +32,7 @@ auto DeleteExecutor::Next(Tuple *tuple, RID *rid) -> bool {
       }
     }
     table_info->table_->DeleteTuple(child_rid);
+    
     count++;
   }
 
