@@ -3,6 +3,9 @@
 
 namespace onebase {
 
+// RAII wrappers for pinned pages. Destructors call Drop(), so callers do not
+// have to remember every UnpinPage or latch release manually.
+
 // --- BasicPageGuard ---
 
 BasicPageGuard::BasicPageGuard(BufferPoolManager *bpm, Page *page)

@@ -4,6 +4,15 @@
 
 namespace onebase {
 
+namespace {
+
+template <typename KeyType, typename KeyComparator>
+auto KeyEqual(const KeyType &lhs, const KeyType &rhs, const KeyComparator &comparator) -> bool {
+  return !comparator(lhs, rhs) && !comparator(rhs, lhs);
+}
+
+}  // namespace
+
 template <typename KeyType, typename ValueType, typename KeyComparator>
 void B_PLUS_TREE_LEAF_PAGE_TYPE::Init(int max_size) {
   SetPageType(IndexPageType::LEAF_PAGE);
@@ -22,10 +31,12 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::ValueAt(int index) const -> ValueType {
   return array_[index].second;
 }
 
+// Return the first slot whose key is not less than the target key.
 template <typename KeyType, typename ValueType, typename KeyComparator>
 auto B_PLUS_TREE_LEAF_PAGE_TYPE::KeyIndex(const KeyType &key, const KeyComparator &comparator) const -> int {
   int left = 0;
   int right = GetSize();
+
   while (left < right) {
     const int mid = left + (right - left) / 2;
     if (comparator(array_[mid].first, key)) {
@@ -41,7 +52,7 @@ template <typename KeyType, typename ValueType, typename KeyComparator>
 auto B_PLUS_TREE_LEAF_PAGE_TYPE::Lookup(const KeyType &key, ValueType *value,
                                          const KeyComparator &comparator) const -> bool {
   const int index = KeyIndex(key, comparator);
-  if (index >= GetSize() || comparator(key, array_[index].first) || comparator(array_[index].first, key)) {
+  if (index >= GetSize() || !KeyEqual(key, array_[index].first, comparator)) {
     return false;
   }
   *value = array_[index].second;
@@ -52,7 +63,7 @@ template <typename KeyType, typename ValueType, typename KeyComparator>
 auto B_PLUS_TREE_LEAF_PAGE_TYPE::Insert(const KeyType &key, const ValueType &value,
                                          const KeyComparator &comparator) -> int {
   const int index = KeyIndex(key, comparator);
-  if (index < GetSize() && !comparator(key, array_[index].first) && !comparator(array_[index].first, key)) {
+  if (index < GetSize() && KeyEqual(key, array_[index].first, comparator)) {
     return GetSize();
   }
 
@@ -68,7 +79,7 @@ template <typename KeyType, typename ValueType, typename KeyComparator>
 auto B_PLUS_TREE_LEAF_PAGE_TYPE::RemoveAndDeleteRecord(const KeyType &key,
                                                         const KeyComparator &comparator) -> int {
   const int index = KeyIndex(key, comparator);
-  if (index >= GetSize() || comparator(key, array_[index].first) || comparator(array_[index].first, key)) {
+  if (index >= GetSize() || !KeyEqual(key, array_[index].first, comparator)) {
     return GetSize();
   }
 

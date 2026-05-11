@@ -4,6 +4,10 @@
 
 namespace onebase {
 
+// Tracks recent frame accesses and chooses an evictable frame using the LRU-K
+// policy. BufferPoolManager marks a frame evictable only after its pin count
+// drops to zero.
+
 LRUKReplacer::LRUKReplacer(size_t num_frames, size_t k)
     : max_frames_(num_frames), k_(k) {}
 

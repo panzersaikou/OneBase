@@ -6,6 +6,10 @@
 
 namespace onebase {
 
+// Top-level B+ tree operations. The tree descends through internal pages to a
+// leaf, performs lookup/insert/delete there, and creates a new root when splits
+// propagate past the old root.
+
 template <typename KeyType, typename ValueType, typename KeyComparator>
 BPLUSTREE_TYPE::BPlusTree(std::string name, BufferPoolManager *bpm, const KeyComparator &comparator,
                            int leaf_max_size, int internal_max_size)

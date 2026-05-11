@@ -43,6 +43,7 @@ auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueIndex(const ValueType &value) const ->
 
 template <typename KeyType, typename ValueType, typename KeyComparator>
 auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::Lookup(const KeyType &key, const KeyComparator &comparator) const -> ValueType {
+  // array_[0].first is unused; array_[0].second stores the leftmost child.
   int left = 1;
   int right = GetSize() - 1;
   int result = 0;
@@ -112,6 +113,7 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::MoveAllTo(BPlusTreeInternalPage *recipient,
 
 template <typename KeyType, typename ValueType, typename KeyComparator>
 void B_PLUS_TREE_INTERNAL_PAGE_TYPE::MoveHalfTo(BPlusTreeInternalPage *recipient, const KeyType &middle_key) {
+  // (void)middle_key;
   const int start = GetSize() / 2 + 1;
   const int move_count = GetSize() - start;
 

@@ -4,6 +4,10 @@
 
 namespace onebase {
 
+// Owns the in-memory page frames. It maps page ids to frames, loads pages from
+// disk on demand, writes dirty victims back, and asks LRUKReplacer for a victim
+// when the free list is empty.
+
   BufferPoolManager::BufferPoolManager(size_t pool_size, DiskManager *disk_manager, size_t replacer_k)
       : pool_size_(pool_size), disk_manager_(disk_manager) {
     pages_ = new Page[pool_size_];
@@ -29,6 +33,7 @@ namespace onebase {
       if (victim.is_dirty_) {
         disk_manager_->WritePage(victim.page_id_, victim.data_);
       }
+
       page_table_.erase(victim.page_id_);
     }
 

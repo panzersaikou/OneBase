@@ -6,6 +6,9 @@
 
 namespace onebase {
 
+// Sequential cursor for leaf-level B+ tree traversal. It advances inside one
+// leaf by index and follows next-page links when the current leaf is exhausted.
+
 template <typename KeyType, typename ValueType, typename KeyComparator>
 BPLUSTREE_ITERATOR_TYPE::BPlusTreeIterator(page_id_t page_id, int index, BufferPoolManager *bpm)
     : page_id_(page_id), index_(index), bpm_(bpm) {}

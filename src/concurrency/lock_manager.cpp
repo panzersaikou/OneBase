@@ -3,15 +3,25 @@
 
 namespace onebase {
 
-auto LockManager::LockShared(Transaction *txn, const RID &rid) -> bool {
-  std::unique_lock<std::mutex> lock(latch_);
+namespace {
 
-  // justice issues
+auto CanAcquireMoreLocks(Transaction *txn) -> bool {
   if (txn->GetState() == TransactionState::ABORTED) {
     return false;
   }
   if (txn->GetState() == TransactionState::SHRINKING) {
     txn->SetState(TransactionState::ABORTED);
+    return false;
+  }
+  return true;
+}
+
+}  // namespace
+
+auto LockManager::LockShared(Transaction *txn, const RID &rid) -> bool {
+  std::unique_lock<std::mutex> lock(latch_);
+
+  if (!CanAcquireMoreLocks(txn)) {
     return false;
   }
   if (txn->IsSharedLocked(rid) || txn->IsExclusiveLocked(rid)) {
@@ -48,11 +58,7 @@ auto LockManager::LockShared(Transaction *txn, const RID &rid) -> bool {
 auto LockManager::LockExclusive(Transaction *txn, const RID &rid) -> bool {
   std::unique_lock<std::mutex> lock(latch_);
 
-  if (txn->GetState() == TransactionState::ABORTED) {
-    return false;
-  }
-  if (txn->GetState() == TransactionState::SHRINKING) {
-    txn->SetState(TransactionState::ABORTED);
+  if (!CanAcquireMoreLocks(txn)) {
     return false;
   }
   if (txn->IsExclusiveLocked(rid)) {
@@ -90,14 +96,11 @@ auto LockManager::LockExclusive(Transaction *txn, const RID &rid) -> bool {
   return true;
 }
 
+
 auto LockManager::LockUpgrade(Transaction *txn, const RID &rid) -> bool {
   std::unique_lock<std::mutex> lock(latch_);
 
-  if (txn->GetState() == TransactionState::ABORTED) {
-    return false;
-  }
-  if (txn->GetState() == TransactionState::SHRINKING) {
-    txn->SetState(TransactionState::ABORTED);
+  if (!CanAcquireMoreLocks(txn)) {
     return false;
   }
   if (txn->IsExclusiveLocked(rid)) {
@@ -155,8 +158,6 @@ auto LockManager::LockUpgrade(Transaction *txn, const RID &rid) -> bool {
   queue.cv_.notify_all();
   return true;
 }
-
-
 
 auto LockManager::Unlock(Transaction *txn, const RID &rid) -> bool {
   std::unique_lock<std::mutex> lock(latch_);
