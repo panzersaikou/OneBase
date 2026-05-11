@@ -6,6 +6,7 @@ namespace onebase {
 auto LockManager::LockShared(Transaction *txn, const RID &rid) -> bool {
   std::unique_lock<std::mutex> lock(latch_);
 
+  // justice issues
   if (txn->GetState() == TransactionState::ABORTED) {
     return false;
   }
@@ -154,6 +155,8 @@ auto LockManager::LockUpgrade(Transaction *txn, const RID &rid) -> bool {
   queue.cv_.notify_all();
   return true;
 }
+
+
 
 auto LockManager::Unlock(Transaction *txn, const RID &rid) -> bool {
   std::unique_lock<std::mutex> lock(latch_);
